@@ -7,6 +7,7 @@ A collection of FastMCP servers providing integrations with various tools used a
 - **Chronosphere** - Query Prometheus/PromQL metrics from Chronosphere
 - **Linear** - Search issues, get issue details, and track project status
 - **Jira** - Retrieve tickets, comments, and project information
+- **GitHub** - Read files, search code, browse repositories, and access commit history
 - **Slack** - Search messages, get threads, and monitor channel activity
 - **Observe** - Query and analyze log data using OPAL (Observe Processing and Analysis Language)
 
@@ -14,8 +15,8 @@ A collection of FastMCP servers providing integrations with various tools used a
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd tecton-mcp-tools
+git clone https://github.com/jbtecton/MCP-Tools.git
+cd MCP-Tools
 ```
 
 ### 2. Install Dependencies
@@ -40,7 +41,7 @@ Add the servers to your Claude MCP configuration file (typically `~/.config/clau
     "servers": {
       "chronosphere": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/chronosphere_server.py"],
+        "args": ["/path/to/MCP-Tools/servers/chronosphere_server.py"],
         "env": {
           "CHRONOSPHERE_DOMAIN": "tecton",
           "CHRONOSPHERE_API_TOKEN": "your-token-here"
@@ -48,30 +49,37 @@ Add the servers to your Claude MCP configuration file (typically `~/.config/clau
       },
       "linear": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/linear_server.py"],
+        "args": ["/path/to/MCP-Tools/servers/linear_server.py"],
         "env": {
           "LINEAR_API_KEY": "your-key-here"
         }
       },
       "jira": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/jira_server.py"],
+        "args": ["/path/to/MCP-Tools/servers/jira_server.py"],
         "env": {
           "JIRA_URL": "https://your-domain.atlassian.net",
           "JIRA_EMAIL": "your-email@example.com",
           "JIRA_API_TOKEN": "your-api-token"
         }
       },
+      "github": {
+        "command": "python",
+        "args": ["/path/to/MCP-Tools/servers/github_server.py"],
+        "env": {
+          "GITHUB_TOKEN": "your-github-personal-access-token"
+        }
+      },
       "slack": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/slack_server.py"],
+        "args": ["/path/to/MCP-Tools/servers/slack_server.py"],
         "env": {
           "SLACK_BOT_TOKEN": "xoxb-your-bot-token-here"
         }
       },
       "observe": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/observe_server.py"],
+        "args": ["/path/to/MCP-Tools/servers/observe_server.py"],
         "env": {
           "OBSERVE_TENANT_URL": "https://your-tenant-id.observeinc.com",
           "OBSERVE_USER_EMAIL": "your-email@example.com",
@@ -91,23 +99,27 @@ Alternatively, you can use the shared environment file approach by sourcing the 
     "servers": {
       "chronosphere": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/chronosphere_server.py"]
+        "args": ["/path/to/MCP-Tools/servers/chronosphere_server.py"]
       },
       "linear": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/linear_server.py"]
+        "args": ["/path/to/MCP-Tools/servers/linear_server.py"]
       },
       "jira": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/jira_server.py"]
+        "args": ["/path/to/MCP-Tools/servers/jira_server.py"]
+      },
+      "github": {
+        "command": "python",
+        "args": ["/path/to/MCP-Tools/servers/github_server.py"]
       },
       "slack": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/slack_server.py"]
+        "args": ["/path/to/MCP-Tools/servers/slack_server.py"]
       },
       "observe": {
         "command": "python",
-        "args": ["/path/to/tecton-mcp-tools/servers/observe_server.py"]
+        "args": ["/path/to/MCP-Tools/servers/observe_server.py"]
       }
     }
   }
@@ -132,6 +144,9 @@ LINEAR_API_KEY=your-linear-api-key
 JIRA_URL=https://your-domain.atlassian.net
 JIRA_EMAIL=your-email@example.com
 JIRA_API_TOKEN=your-jira-api-token
+
+# GitHub Configuration
+GITHUB_TOKEN=your-github-personal-access-token
 
 # Slack Configuration
 SLACK_BOT_TOKEN=xoxb-your-bot-token-here
@@ -158,6 +173,15 @@ OBSERVE_API_TOKEN=your-observe-bearer-token
 1. Go to Atlassian Account Settings → Security → API tokens
 2. Create a new API token
 3. Use your Atlassian email and the generated token
+
+#### GitHub
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Generate a new token (classic)
+3. Select the following scopes:
+   - `repo` - Full control of private repositories (if you need access to private repos)
+   - `public_repo` - Access to public repositories (if you only need public repos)
+   - `read:org` - Read organization membership (if accessing organization repositories)
+4. Copy the generated token and use it as `GITHUB_TOKEN`
 
 #### Slack
 1. Go to api.slack.com → Your Apps
@@ -215,6 +239,19 @@ OBSERVE_API_TOKEN=your-observe-bearer-token
   - `get_jira_ticket()` - Get ticket details by key
   - `get_jira_ticket_comments()` - Get ticket comments
 
+### GitHub Server
+- **File**: `servers/github_server.py`
+- **Purpose**: Access GitHub repositories, files, and code
+- **Key Tools**:
+  - `github_health_check()` - Test GitHub connection and get user info
+  - `github_read_file()` - Read files from any repository branch or commit
+  - `github_list_directory()` - Browse repository directory structures
+  - `github_search_code()` - Search for code across repositories
+  - `github_get_commits()` - Get commit history for repositories or specific files
+  - `github_get_branches()` - List all branches in a repository
+  - `github_get_repository_info()` - Get detailed repository information
+  - `github_search_repositories()` - Search for repositories on GitHub
+
 ### Slack Server
 - **File**: `servers/slack_server.py`
 - **Purpose**: Search and monitor Slack activity
@@ -249,6 +286,9 @@ python servers/linear_server.py
 # Test Jira
 python servers/jira_server.py
 
+# Test GitHub
+python servers/github_server.py
+
 # Test Slack
 python servers/slack_server.py
 
@@ -259,7 +299,7 @@ python servers/observe_server.py
 ## 📁 Project Structure
 
 ```
-tecton-mcp-tools/
+MCP-Tools/
 ├── README.md
 ├── requirements.txt
 ├── .env.example
@@ -269,6 +309,7 @@ tecton-mcp-tools/
     ├── chronosphere_server.py
     ├── linear_server.py
     ├── jira_server.py
+    ├── github_server.py
     ├── slack_server.py
     └── observe_server.py
 ```
