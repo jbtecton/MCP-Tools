@@ -178,7 +178,7 @@ def get_jira_ticket(ticket_key: str) -> Dict[str, Any]:
         return {"error": f"Failed to get ticket: {str(e)}"}
 
 @mcp.tool()
-def get_jira_ticket_comments(ticket_key: str, max_comments: Optional[int] = 10) -> Dict[str, Any]:
+def get_jira_ticket_comments(ticket_key: str, max_comments: Optional[str] = '100') -> Dict[str, Any]:
     """
     Get comments for a Jira ticket/issue
     
@@ -249,7 +249,8 @@ def search_jira_tickets(
         }
         
         # Make request using same auth method as other functions
-        url = f"{JIRA_URL}/rest/api/3/search"
+        # Updated to use new search/jql endpoint per Atlassian API migration
+        url = f"{JIRA_URL}/rest/api/3/search/jql"
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json"
